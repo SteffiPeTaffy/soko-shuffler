@@ -11,61 +11,45 @@ BleKeyboard bleKeyboard("Soko Shuffler");
 String currentUrl;
 int totalResults;
 
-void clearScreen(){
+void clearScreen()
+{
   M5.Lcd.setTextSize(4);
   M5.Lcd.setTextColor(WHITE, BLACK);
-  M5.Lcd.setCursor(0,0);
+  M5.Lcd.setCursor(0, 0);
   M5.Lcd.print("                                                                                                                                                                            ");
 }
 
-void displayTopic(String topic)
+void displaySoko(String topic, String title, String description)
 {
+  clearScreen();
+
+  //display topic
   M5.Lcd.setTextColor(WHITE, BLACK);
   M5.Lcd.setTextSize(2);
   M5.Lcd.setCursor(5, 10);
   M5.Lcd.print(topic.substring(0, 19));
-}
 
-void displayDescription(String description)
-{
-  M5.Lcd.setTextColor(WHITE, BLACK);
+  //display title
+  int titleMax = (title.length() > 26) ? 26 : title.length();
+  M5.Lcd.setCursor(5, 30);
+   M5.Lcd.setTextSize(3);
+  M5.Lcd.print(title.substring(0, titleMax));
+
+  //display description
+  if (titleMax > 14)
+  {
+    M5.Lcd.setCursor(5, 90);
+  }
+  else
+  {
+    M5.Lcd.setCursor(5, 70);
+  }
   M5.Lcd.setTextSize(1);
-  M5.Lcd.setCursor(5, 75);
   M5.Lcd.print(description);
-}
-
-void clearTitle()
-{
-  M5.Lcd.setTextColor(WHITE, BLACK);
-  M5.Lcd.setTextSize(3);
-  M5.Lcd.setCursor(5, 30);
-  M5.Lcd.print("             ");
-}
-
-void displayTitle(String title)
-{
-  clearTitle();
-  int titleMax = (title.length() > 13) ? 13 : title.length();
-  M5.Lcd.setCursor(5, 30);
-  M5.Lcd.print(title.substring(0, titleMax - 1));
-  // delay(1000);
-
-  // for (int i = 0; i <= title.length() - titleMax + 1; i++)
-  // {
-  //   clearTitle();
-  //   M5.Lcd.setCursor(5, 30);
-  //   M5.Lcd.print(title.substring(i, i + titleMax - 1));
-  //   delay(1000);
-  // }
-  // clearTitle();
-  // M5.Lcd.setCursor(5, 30);
-  // M5.Lcd.print(title.substring(0, titleMax - 1));
 }
 
 void connectToNetwork()
 {
-  Serial.println("WIFI_SSID" + String(WIFI_SSID));
-  Serial.println("WIFI_PASS" + String(WIFI_PASS));
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -93,13 +77,13 @@ void initDisplay()
 {
   M5.Lcd.setRotation(1);
   M5.Lcd.fillScreen(BLACK);
-  M5.Lcd.setCursor(10,60);
+  M5.Lcd.setCursor(10, 60);
   M5.Lcd.setTextColor(WHITE, BLACK);
   M5.Lcd.setTextSize(2);
   M5.Lcd.println("Getting Ready!");
 }
 
-void fetchSoko(int offset=0)
+void fetchSoko(int offset = 0)
 {
   Serial.println("Fetching soko...");
 
@@ -132,10 +116,7 @@ void fetchSoko(int offset=0)
     String url = doc["result"]["results"][0]["url_video_hd"];
     totalResults = doc["result"]["queryInfo"]["totalResults"];
 
-    clearScreen();
-    displayTopic(topic);
-    displayDescription(description);
-    displayTitle(title);
+    displaySoko(topic, title, description);
     currentUrl = url;
   }
   else
@@ -162,20 +143,22 @@ void loop()
   M5.update();
   if (M5.BtnA.wasPressed())
   {
-    int offset = random(0, totalResults+1);
+    int offset = random(0, totalResults + 1);
     fetchSoko(offset);
   }
   if (M5.BtnB.wasPressed())
   {
     bleKeyboard.write(KEY_F5);
     delay(1000);
-    for(int i=0; i<10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
       bleKeyboard.write(KEY_RIGHT_ARROW);
       delay(100);
     }
     bleKeyboard.write(KEY_RETURN);
     delay(5000);
-    for(int i=0; i<currentUrl.length(); i++){
+    for (int i = 0; i < currentUrl.length(); i++)
+    {
       bleKeyboard.print(currentUrl[i]);
       delay(100);
     }
