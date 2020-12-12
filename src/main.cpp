@@ -4,10 +4,7 @@
 #include <HTTPClient.h>
 #include <BleKeyboard.h>
 #include <ArduinoJson.h>
-#include "tb_display.h"
-
-#define WIFI_SSID "<your wifi name>"
-#define WIFI_PASS "<your wifi password>"
+#include <secrets.h>
 
 BleKeyboard bleKeyboard("Soko Shuffler");
 
@@ -67,8 +64,9 @@ void displayTitle(String title)
 
 void connectToNetwork()
 {
+  Serial.println("WIFI_SSID" + String(WIFI_SSID));
+  Serial.println("WIFI_PASS" + String(WIFI_PASS));
   WiFi.begin(WIFI_SSID, WIFI_PASS);
-
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.println("Establishing connection to WiFi...");
